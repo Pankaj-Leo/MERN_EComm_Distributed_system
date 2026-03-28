@@ -1,0 +1,48 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: cart
+  namespace: mern-ecommerce
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: cart
+  template:
+    metadata:
+      labels:
+        app: cart
+    spec:
+      containers:
+        - name: cart
+          image: mern-microservices-lean-rebuilt-cart:latest
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 3003
+          envFrom:
+            - configMapRef:
+                name: global-config
+          env:
+            - name: AMQP_URL
+              value: "amqp://guest:guest@rabbitmq:5672"
+            - name: RABBIT_URL
+              value: "amqp://guest:guest@rabbitmq:5672"
+          readinessProbe:
+            httpGet:
+              path: /health
+              port: 3003
+            initialDelaySeconds: 5
+            periodSeconds: 10
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: cart
+  namespace: mern-ecommerce
+spec:
+  selector:
+    app: cart
+  ports:
+    - name: http
+      port: 3003
+      targetPort: 3003

@@ -1,0 +1,16 @@
+{
+  "name": "cart-service",
+  "version": "1.0.0",
+  "main": "index.js",
+  "type": "module",
+  "scripts": {
+    "start": "node index.js"
+  },
+  "dependencies": {
+    "express": "^4.19.2",
+    "mongoose": "^8.19.1",
+    "dotenv": "^16.4.5",
+    "amqplib": "^0.10.4",
+    "prom-client": "^15.1.3"
+  }
+}

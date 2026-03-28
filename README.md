@@ -6,7 +6,7 @@ A **production-shaped, educational microservices platform** built with MongoDB, 
 
 ---
 
-![](info.png)
+![](https://github.com/Pankaj-Leo/MERN_EComm_Distributed_system/blob/main/Info.png)
 ---
 
 ## Architecture

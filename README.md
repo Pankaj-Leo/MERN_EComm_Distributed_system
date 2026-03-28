@@ -6,22 +6,7 @@ A **production-shaped, educational microservices platform** built with MongoDB, 
 
 ---
 
-## Table of Contents
-
-- [Architecture](#architecture)
-- [Services Overview](#services-overview)
-- [Tech Stack](#tech-stack)
-- [Repository Layout](#repository-layout)
-- [Prerequisites](#prerequisites)
-- [Quick Start — Docker Compose](#quick-start--docker-compose)
-- [Kubernetes Deployment](#kubernetes-deployment)
-- [API Reference](#api-reference)
-- [Monitoring & Observability](#monitoring--observability)
-- [Configuration](#configuration)
-- [Design Decisions & Trade-offs](#design-decisions--trade-offs)
-- [Extending the Project](#extending-the-project)
-- [Troubleshooting](#troubleshooting)
-
+![](info.png)
 ---
 
 ## Architecture
@@ -54,18 +39,6 @@ A **production-shaped, educational microservices platform** built with MongoDB, 
 │  Grafana    :3000  ←  pre-provisioned dashboards    │
 │  RabbitMQ UI :15672                                 │
 └─────────────────────────────────────────────────────┘
-```
-
-### Checkout Data Flow
-
-```
-1.  User clicks "Checkout" in React UI
-2.  POST /cart/checkout → Gateway → Cart Service
-3.  Cart serializes order JSON → publishes to RabbitMQ "orders" queue
-4.  HTTP 200 returned immediately to browser
-5a. Order Service   → reads message → saves order to MongoDB → updates Prometheus counters
-5b. Shipping Service → reads same message → saves shipping record → increments shipment metric
-```
 
 ---
 
@@ -87,74 +60,8 @@ A **production-shaped, educational microservices platform** built with MongoDB, 
 
 ---
 
-## Tech Stack
-
-| Layer            | Technology                    | Version    |
-|------------------|-------------------------------|------------|
-| Frontend         | React, Vite                   | 18, 6.4    |
-| API Gateway      | Express, http-proxy-middleware| 4.19, 3.0  |
-| Backend Services | Node.js, Express              | 20+, 4.19  |
-| Database ORM     | Mongoose                      | 8.19       |
-| Database         | MongoDB                       | 7          |
-| Message Broker   | RabbitMQ, amqplib             | 3, 0.10    |
-| Auth             | bcryptjs, jsonwebtoken        | 2.4, 9.0   |
-| Metrics Client   | prom-client                   | 15.1       |
-| Monitoring       | Prometheus, Grafana           | 2.55, 11.2 |
-| Containers       | Docker, Docker Compose        | —          |
-| Orchestration    | Kubernetes                    | —          |
-
----
-
-## Repository Layout
 
 ```
-mern-microservices-lean-rebuilt-main/
-├── client/                       # React + Vite frontend
-│   ├── src/
-│   │   ├── main.jsx              # App root — auth, catalog, cart views
-│   │   └── components/
-│   │       └── ProductGrid.jsx   # Product display grid
-│   ├── Dockerfile                # Multi-stage build (build → serve)
-│   └── vite.config.js
-│
-├── services/
-│   ├── gateway/                  # API Gateway (CommonJS)
-│   │   ├── index.js              # Proxy routes, health, metrics
-│   │   └── metrics.js            # HTTP request counter middleware
-│   ├── auth/                     # Authentication (ESM)
-│   │   └── index.js              # /signup, /login, JWT
-│   ├── catalog/                  # Product catalog (ESM)
-│   │   ├── index.js              # /products, /seed, /uploads static
-│   │   ├── models/Product.js
-│   │   └── uploads/              # 8 demo product JPGs
-│   ├── cart/                     # Shopping cart (ESM)
-│   │   └── index.js              # In-memory cart, RabbitMQ publish
-│   ├── order/                    # Order processor (ESM)
-│   │   ├── index.js              # RabbitMQ consumer, MongoDB persistence
-│   │   └── metrics.js            # Counter, revenue gauge, histogram
-│   └── shipping/                 # Shipping processor (ESM)
-│       ├── index.js              # RabbitMQ consumer, shipping records
-│       └── metrics.js            # Shipments counter
-│
-├── k8s/                          # Kubernetes manifests
-│   ├── namespace.yaml
-│   ├── configmap.yaml
-│   ├── *-deployment.yaml         # One per service + infra
-│   └── README.txt
-│
-├── monitoring/
-│   ├── prometheus/
-│   │   └── prometheus.yml        # Scrape config (5s interval)
-│   └── grafana/
-│       ├── provisioning/         # Auto-provision datasource + dashboards
-│       └── dashboards/           # microservices.json, order-shipping.json
-│
-├── docker-compose.yml            # Full 13-service local stack
-├── .env.example                  # Environment variable template
-└── patch.json                    # kubectl patch examples
-```
-
----
 
 ## Prerequisites
 
@@ -349,26 +256,6 @@ orders_revenue_total
 
 ---
 
-## Configuration
-
-### Environment Variables
-
-| Variable        | Default                          | Description                                     |
-|-----------------|----------------------------------|-------------------------------------------------|
-| `JWT_SECRET`    | `dev_change_me`                  | JWT signing secret — **change before any deployment** |
-| `MONGO_URL`     | `mongodb://mongo:27017/appdb`    | MongoDB connection string                       |
-| `RABBIT_URL`    | `amqp://rabbitmq:5672`           | RabbitMQ connection string                      |
-| `AMQP_URL`      | `amqp://rabbitmq:5672`           | Alias used by order and shipping services       |
-| `VITE_API_BASE` | `http://localhost:8080`          | Gateway URL consumed by the React frontend      |
-| `GATEWAY_PORT`  | `8080`                           | Gateway listen port                             |
-| `AUTH_PORT`     | `3001`                           | Auth service port                               |
-| `CATALOG_PORT`  | `3002`                           | Catalog service port                            |
-| `CART_PORT`     | `3003`                           | Cart service port                               |
-| `ORDER_PORT`    | `3004`                           | Order service port                              |
-
-Copy `.env.example` → `.env` and adjust values before running Docker Compose.
-
----
 
 ## Design Decisions & Trade-offs
 
@@ -385,51 +272,12 @@ These are intentional simplifications, not oversights. Each has a documented pro
 | **No request body validation**                  | Reduces setup noise                            | Zod or Joi schema middleware on every POST route     |
 
 ---
+## Author
 
-## Extending the Project
+**Pankaj Somkuwar** - AI Engineer / AI Product Manager / AI Solutions Architect
 
-Ordered roughly by difficulty — each one closes a real production gap:
+- LinkedIn: [Pankaj Somkuwar](https://www.linkedin.com/in/pankaj-somkuwar/)
+- GitHub: [@Pankaj-Leo](https://github.com/Pankaj-Leo)
+- Website: [Pankaj Somkuwar](https://www.pankajsomkuwarai.com)
+- Email: [pankaj.som1610@gmail.com](mailto:pankaj.som1610@gmail.com)
 
-1. **Add JWT middleware** to cart and order routes — verify the `Authorization: Bearer` header before allowing checkout
-2. **Make the cart persistent** — replace the in-memory array with a Redis-backed or MongoDB-backed user cart
-3. **Add idempotency** to the order consumer — use a `messageId` field to prevent duplicate order inserts on retry
-4. **Add a notifications service** — a third RabbitMQ consumer that sends email on order confirmation
-5. **Introduce distributed tracing** — OpenTelemetry instrumentation routed to Jaeger
-6. **Add Horizontal Pod Autoscaler** — scale the Order service based on RabbitMQ queue depth
-7. **Add integration tests** — Testcontainers for real MongoDB and RabbitMQ in CI
-8. **Implement API versioning** — prefix all routes with `/v1/`
-
----
-
-## Troubleshooting
-
-**Services not starting**
-```bash
-docker compose ps           # Identify unhealthy containers
-docker compose logs auth    # View logs for a specific service
-```
-
-**RabbitMQ connection errors in Order / Shipping**
-Order and shipping retry up to 10 times at 5-second intervals. If errors persist beyond 50 seconds, RabbitMQ itself failed to start — check `docker compose logs rabbitmq`.
-
-**MongoDB connection refused**
-`MONGO_URL` uses the service name `mongo` inside Docker networks. If running services locally (outside Docker), change it to `localhost:27017`.
-
-**Client shows blank page or CORS errors**
-Confirm `VITE_API_BASE` points to the gateway (`http://localhost:8080`). The gateway sets `Access-Control-Allow-Origin: *` — if CORS errors appear, the request is bypassing the gateway.
-
-**Grafana shows no data**
-Check http://localhost:9090/targets — all scrape targets should show state `UP`. If a target is `DOWN`, the service's `/metrics` endpoint is unreachable from the Prometheus container.
-
-**Full reset**
-```bash
-docker compose down -v --remove-orphans
-docker compose up --build
-curl -X POST http://localhost:8080/catalog/seed
-```
-
----
-
-## License
-
-Educational and portfolio reference implementation. Audit secrets, authentication coverage, and scaling configuration before any production use.
